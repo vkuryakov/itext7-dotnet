@@ -98,6 +98,43 @@ namespace iText.IO.Util {
             return isp;
         }
 
+        public static byte[] GetStreamBytes(Uri url)
+        {
+            Stream s = null;
+            try
+            {
+                if (url.IsFile)
+                {
+                    // Use url.LocalPath because it's needed for handling UNC pathes (like used in local
+                    // networks, e.g. \\computer\file.ext). It's safe to use #LocalPath because we 
+                    // check #IsFile beforehand. On the other hand, the url.AbsolutePath provides escaped string and also breaks
+                    // UNC path.
+                    s = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read);
+                }
+                else
+                {
+#if !NETSTANDARD1_6
+                    WebRequest req = WebRequest.Create(url);
+                    req.Credentials = CredentialCache.DefaultCredentials;
+                    using (WebResponse res = req.GetResponse())
+                    using (Stream rs = res.GetResponseStream())
+                    return StreamUtil.InputStreamToArray(rs);
+#else
+                    HttpClient client = new HttpClient();
+                    s = client.GetStreamAsync(url).Result;
+#endif
+                }
+                return StreamUtil.InputStreamToArray(s);
+            }
+            finally
+            {
+                if (s != null)
+                {
+                    s.Dispose();
+                }
+            }
+        }
+
         /// <summary>
         /// This method makes a normalized URI from a given filename. 
         /// </summary>

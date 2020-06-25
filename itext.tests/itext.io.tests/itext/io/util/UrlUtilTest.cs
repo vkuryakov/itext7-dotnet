@@ -49,6 +49,10 @@ namespace iText.IO.Util {
     public class UrlUtilTest : ExtendedITextTest {
         private static readonly String destinationFolder = NUnit.Framework.TestContext.CurrentContext.TestDirectory
              + "/test/itext/io/UrlUtilTest/";
+        private static readonly String projectFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
+                .CurrentContext.TestDirectory);
+        private static readonly string resPath = projectFolder + "/resources/itext/io/util/textFile.dat";
+        private static readonly string resPathContent = "Hello world from text file!";
 
         [NUnit.Framework.OneTimeSetUp]
         public static void BeforeClass() {
@@ -81,15 +85,21 @@ namespace iText.IO.Util {
 
         [NUnit.Framework.Test]
         public void OpenStreamTest() {
-            String projectFolder = iText.Test.TestUtil.GetParentProjectDirectory(NUnit.Framework.TestContext
-                .CurrentContext.TestDirectory);
-            string resPath = projectFolder + "/resources/itext/io/util/textFile.dat";
             Stream openStream = UrlUtil.OpenStream(new Uri(resPath));
 
             byte[] bytes = StreamUtil.InputStreamToArray(openStream);
             String actual = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            NUnit.Framework.Assert.AreEqual("Hello world from text file!", actual);
+            NUnit.Framework.Assert.AreEqual(resPathContent, actual);
             
+        }
+
+        [NUnit.Framework.Test]
+        public void GetStreamBytes()
+        {
+            byte[] bytes = UrlUtil.GetStreamBytes(new Uri(resPath));
+            String actual = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            NUnit.Framework.Assert.AreEqual(resPathContent, actual);
+
         }
     }
 }

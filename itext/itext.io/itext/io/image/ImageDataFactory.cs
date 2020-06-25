@@ -454,54 +454,8 @@ namespace iText.IO.Image {
         }
 
         private static ImageData CreateImageInstance(Uri source, bool recoverImage) {
-            ImageType imageType = ImageTypeDetector.DetectImageType(source);
-            switch (imageType) {
-                case ImageType.GIF: {
-                    GifImageData image = new GifImageData(source);
-                    GifImageHelper.ProcessImage(image, 0);
-                    return image.GetFrames()[0];
-                }
-
-                case ImageType.JPEG: {
-                    ImageData image = new JpegImageData(source);
-                    JpegImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                case ImageType.JPEG2000: {
-                    ImageData image = new Jpeg2000ImageData(source);
-                    Jpeg2000ImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                case ImageType.PNG: {
-                    ImageData image = new PngImageData(source);
-                    PngImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                case ImageType.BMP: {
-                    ImageData image = new BmpImageData(source, false);
-                    BmpImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                case ImageType.TIFF: {
-                    ImageData image = new TiffImageData(source, recoverImage, 1, false);
-                    TiffImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                case ImageType.JBIG2: {
-                    ImageData image = new Jbig2ImageData(source, 1);
-                    Jbig2ImageHelper.ProcessImage(image);
-                    return image;
-                }
-
-                default: {
-                    throw new iText.IO.IOException(iText.IO.IOException.ImageFormatCannotBeRecognized);
-                }
-            }
+            byte[] sourceBytes = UrlUtil.GetStreamBytes(source);
+            return CreateImageInstance(sourceBytes, recoverImage);
         }
 
         private static ImageData CreateImageInstance(byte[] bytes, bool recoverImage) {
